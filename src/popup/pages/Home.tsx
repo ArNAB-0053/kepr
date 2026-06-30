@@ -4,6 +4,7 @@ import { SaveButton } from "../components/SaveButton"
 import { storageService, isExtensionContextActive } from "~lib/storage/storage.service"
 import type { ProblemData } from "~lib/types/problem"
 import { AlertTriangle, Info, PenSquare } from "lucide-react"
+import { marked } from "marked"
 
 /**
  * Custom inline GitHub SVG icon.
@@ -36,6 +37,7 @@ export const Home: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [isConfigured, setIsConfigured] = useState(false)
   const [notes, setNotes] = useState("")
+  const [mode, setMode] = useState<"edit" | "preview">("edit")
 
   // Context status flags
   const [isContextInvalidated, setIsContextInvalidated] = useState(false)
@@ -163,7 +165,7 @@ export const Home: React.FC = () => {
    */
   const handleManualSync = async () => {
     if (!problem) return
-    
+
     try {
       if (!isExtensionContextActive()) {
         console.warn("[LeetPush] Cannot run manual sync: extension context is inactive.")
@@ -234,20 +236,53 @@ export const Home: React.FC = () => {
 
       {/* Notes Textarea Section */}
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[9px] font-bold text-muted-foreground uppercase tracking-wider select-none">
-          <span className="flex items-center gap-1">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
             <PenSquare size={10} className="text-primary" />
             Revision Notes
-          </span>
-          <span className="text-[8px] font-normal text-muted-foreground/50">Auto-saved</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setMode("edit")}
+              className={`px-2 py-1 rounded text-[9px] ${mode === "edit"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground"
+                }`}
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={() => setMode("preview")}
+              className={`px-2 py-1 rounded text-[9px] ${mode === "preview"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground"
+                }`}
+            >
+              👁 Preview
+            </button>
+          </div>
         </div>
-        <textarea
-          value={notes}
-          onChange={handleNotesChange}
-          disabled={!problem}
-          placeholder={problem ? "Write complexity analysis, key takeaways, or notes..." : "Open a LeetCode problem to write notes."}
-          className="w-full h-[220px] bg-card border border-border rounded-lg p-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none placeholder:text-muted-foreground/45 transition-colors duration-200 leading-normal"
-        />
+
+        {mode === "edit" ? (
+          <textarea
+            value={notes}
+            onChange={handleNotesChange}
+            disabled={!problem}
+            placeholder={problem ? "Write complexity analysis, key takeaways, or notes..." : "Open a LeetCode problem to write notes."}
+            className="w-full h-[220px] bg-card border border-border rounded-lg p-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none placeholder:text-muted-foreground/45 transition-colors duration-200 leading-normal"
+          />
+        ) : (
+          <div className="h-[220px] overflow-x-hidden overflow-y-auto">
+            <div
+              className="markdown-preview "
+              dangerouslySetInnerHTML={{
+                __html: marked.parse(notes)
+              }}
+            />
+          </div>
+        )}
         {/* Recommendation Helper Caption */}
         <p className="text-[8.5px] leading-normal text-muted-foreground/60 select-none">
           We recommend writing notes in LeetCode's Notes section first and then copying them here for long-term storage in GitHub.
@@ -272,10 +307,10 @@ export const Home: React.FC = () => {
       {/* Action Save Button & Status indicators */}
       {problem && (
         <div className="space-y-1.5 pt-0.5">
-          <SaveButton 
-            status={syncStatus} 
-            disabled={!isConfigured} 
-            onClick={handleManualSync} 
+          <SaveButton
+            status={syncStatus}
+            disabled={!isConfigured}
+            onClick={handleManualSync}
           />
 
           {/* Minimal Inline Sync Status Logger */}

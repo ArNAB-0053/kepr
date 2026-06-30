@@ -20,8 +20,8 @@ export const CurrentProblem: React.FC<CurrentProblemProps> = ({ problem }) => {
 
   return (
     <div className="bg-card rounded-lg border border-border/60 p-2.5 select-none">
-      <h2 className="text-[11px] font-bold text-foreground leading-snug">
-        Active: {problem.id}. {problem.title}
+      <h2 className="text-[11px] font-bold text-foreground leading-snug truncate">
+        {Number(problem.id)}. {problem.title}
       </h2>
     </div>
   )
