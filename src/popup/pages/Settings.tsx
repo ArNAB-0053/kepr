@@ -3,6 +3,7 @@ import { GitHubSettings } from "../components/GitHubSettings"
 import { storageService } from "~lib/storage/storage.service"
 import { githubService } from "~lib/github/github.service"
 import type { GitHubSettings as SettingsType } from "~lib/types/settings"
+import { Loader } from "lucide-react"
 
 /**
  * Settings configuration screen for LeetPush.
@@ -12,11 +13,16 @@ export const Settings: React.FC = () => {
   const [settings, setSettings] = useState<SettingsType | null>(null)
 
   useEffect(() => {
+    let mounted = true
     const loadSettings = async () => {
       const currentSettings = await storageService.getGitHubSettings()
-      setSettings(currentSettings)
+      if (mounted)
+        setSettings(currentSettings)
     }
     loadSettings()
+    return () => {
+      mounted = false
+    }
   }, [])
 
   const handleSaveSettings = async (newSettings: SettingsType) => {
@@ -25,8 +31,27 @@ export const Settings: React.FC = () => {
   }
 
   const handleTestConnection = async (pat: string, repo: string) => {
-    const result = await githubService.validateCredentials(pat, repo)
-    return result
+    try {
+      const result = await githubService.validateCredentials(pat, repo)
+
+      return {
+        success: result.isValid,
+        error: result.error
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      }
+    }
+  }
+
+  if (!settings) {
+    return (
+      <div className="p-4 text-xs text-muted-foreground flex flex-col items-center justify-center mt-28">
+        <Loader className="animate-spin h-6 w-6 inline-block" />
+      </div>
+    )
   }
 
   return (
