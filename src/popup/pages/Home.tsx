@@ -3,7 +3,7 @@ import { CurrentProblem } from "../components/CurrentProblem"
 import { SaveButton } from "../components/SaveButton"
 import { storageService, isExtensionContextActive } from "~lib/storage/storage.service"
 import type { ProblemData } from "~lib/types/problem"
-import { AlertTriangle, Info, PenSquare } from "lucide-react"
+import { AlertTriangle, Eye, FileText, Info, PenSquare } from "lucide-react"
 import { marked } from "marked"
 
 /**
@@ -255,12 +255,12 @@ export const Home: React.FC = () => {
 
             <button
               onClick={() => setMode("preview")}
-              className={`px-2 py-1 rounded text-[9px] ${mode === "preview"
+              className={`px-2 py-1 rounded text-[9px] flex items-center justify-center gap-0.5 ${mode === "preview"
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground"
                 }`}
             >
-              👁 Preview
+              <Eye className="w-3 h-3"/> Preview
             </button>
           </div>
         </div>
@@ -271,12 +271,27 @@ export const Home: React.FC = () => {
             onChange={handleNotesChange}
             disabled={!problem}
             placeholder={problem ? "Write complexity analysis, key takeaways, or notes..." : "Open a LeetCode problem to write notes."}
-            className="w-full h-[220px] bg-card border border-border rounded-lg p-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none placeholder:text-muted-foreground/45 transition-colors duration-200 leading-normal"
+            className="w-full h-[220px] bg-[#ffffff05] border border-border rounded-lg p-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none placeholder:text-muted-foreground/45 transition-colors duration-200 leading-normal"
           />
         ) : (
-          <div className="h-[220px] overflow-x-hidden overflow-y-auto">
+          <div className="h-[220px] overflow-x-hidden overflow-y-auto border border-border rounded-lg p-2.5 bg-[#ffffff05]">
+            {
+              notes.trim() === "" && (
+                <div className="flex flex-col items-center justify-center h-full gap-y-1 text-center select-none px-6">
+                  <div className="rounded-full bg-muted/50 p-4">
+                    <FileText className="h-6 w-6 text-muted-foreground/50" strokeWidth={1.5} />
+                  </div>
+                  <div className="opacity-80">
+                    <p className="text-xs font-medium text-muted-foreground">No notes yet</p>
+                    <p className="text-[11px] text-muted-foreground/70">
+                      Switch to Edit mode to start writing
+                    </p>
+                  </div>
+                </div>
+              )
+            }
             <div
-              className="markdown-preview "
+              className="markdown-preview"
               dangerouslySetInnerHTML={{
                 __html: marked.parse(notes)
               }}
