@@ -16,8 +16,6 @@ jobs:
       - name: Release Please
         uses: googleapis/release-please-action@v4
         id: release
-        with:
-          release-type: node
 
       # Below steps run ONLY when a new Release is created (i.e. Release PR is merged)
       - name: Checkout repository at tag
