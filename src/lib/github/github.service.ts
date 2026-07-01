@@ -74,7 +74,7 @@ export const githubService = {
       
       return { isValid: true }
     } catch (error: any) {
-      console.error("[LeetPush] GitHub validation failed:", error)
+      console.error("[Kepr] GitHub validation failed:", error)
       let message = "Failed to connect to GitHub."
       if (error.status === 401) {
         message = "Invalid Personal Access Token (401 Unauthorized)."
@@ -114,7 +114,7 @@ export const githubService = {
         owner,
         repo,
         path: solutionPath,
-        message: `LeetPush: Sync solution for "${metadata.title}" [${metadata.language}]`,
+        message: `Kepr: Sync solution for "${metadata.title}" [${metadata.language}]`,
         content: toBase64(code),
         sha: solutionSha || undefined,
       })
@@ -128,7 +128,7 @@ export const githubService = {
         owner,
         repo,
         path: notesPath,
-        message: `LeetPush: Sync notes.md for "${metadata.title}"`,
+        message: `Kepr: Sync notes.md for "${metadata.title}"`,
         content: toBase64(notesContent),
         sha: notesSha || undefined,
       })
@@ -157,7 +157,7 @@ export const githubService = {
             lastUpdatedAt: now
           }
         } catch (e) {
-          console.warn("[LeetPush] Failed to merge existing metadata. Overwriting:", e)
+          console.warn("[Kepr] Failed to merge existing metadata. Overwriting:", e)
         }
       }
 
@@ -165,14 +165,14 @@ export const githubService = {
         owner,
         repo,
         path: metadataPath,
-        message: `LeetPush: Sync metadata.json for "${metadata.title}"`,
+        message: `Kepr: Sync metadata.json for "${metadata.title}"`,
         content: toBase64(JSON.stringify(finalMetadata, null, 2)),
         sha: metadataSha || undefined,
       })
 
       return { success: true }
     } catch (error: any) {
-      console.error("[LeetPush] GitHub sync error:", error)
+      console.error("[Kepr] GitHub sync error:", error)
       return { success: false, error: error.message || "Failed to commit solution to GitHub." }
     }
   }

@@ -22,7 +22,7 @@ export class ActivityTracker {
     const existing = await storageService.getActiveSession(this.slug)
     if (existing) {
       this.session = existing
-      console.log(`[LeetPush] Restored active session for ${this.slug}: ${Math.round(this.session.activeDurationSeconds)}s`)
+      console.log(`[Kepr] Restored active session for ${this.slug}: ${Math.round(this.session.activeDurationSeconds)}s`)
     } else {
       this.session = {
         startedAt: new Date().toISOString(),
@@ -30,7 +30,7 @@ export class ActivityTracker {
         lastActiveTimestamp: null,
       }
       await this.save()
-      console.log(`[LeetPush] Started new active session for ${this.slug}`)
+      console.log(`[Kepr] Started new active session for ${this.slug}`)
     }
 
     // Start tracking if the tab is currently active and focused

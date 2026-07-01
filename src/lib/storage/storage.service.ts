@@ -1,6 +1,7 @@
 import type { GitHubSettings } from "../types/settings"
 import type { ProblemData } from "../types/problem"
 import type { SubmissionMetadata } from "../types/metadata"
+import { DEFAULT_GITHUB_SETTINGS } from "../constants/settings"
 
 export interface ActiveSession {
   startedAt: string
@@ -60,11 +61,11 @@ const chromeStorageChangeListener = (
       try {
         cb(updatedValues)
       } catch (err) {
-        console.error("[LeetPush] Error in storage change subscriber callback:", err)
+        console.error("[Kepr] Error in storage change subscriber callback:", err)
       }
     })
   } catch (error) {
-    console.error("[LeetPush] Error processing chrome storage onChanged event:", error)
+    console.error("[Kepr] Error processing chrome storage onChanged event:", error)
   }
 }
 
@@ -81,7 +82,7 @@ export const storageService = {
     const hasStorage = hasChrome && chrome.storage !== undefined
     const activeContext = isExtensionContextActive()
     
-    console.log("[LeetPush] --- Diagnostics ---")
+    console.log("[Kepr] --- Diagnostics ---")
     console.log(`- Browser 'chrome' object defined: ${hasChrome}`)
     console.log(`- 'chrome.storage' defined: ${hasStorage}`)
     console.log(`- Extension context active: ${activeContext}`)
@@ -102,14 +103,14 @@ export const storageService = {
       try {
         chrome.storage.local.get([key], (result) => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] getNotes error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] getNotes error:", chrome.runtime.lastError.message)
             resolve("")
           } else {
             resolve(result[key] || "")
           }
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access getNotes:", error)
+        console.error("[Kepr] Failed to access getNotes:", error)
         resolve("")
       }
     })
@@ -130,12 +131,12 @@ export const storageService = {
       try {
         chrome.storage.local.set({ [key]: notes }, () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] setNotes error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] setNotes error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access setNotes:", error)
+        console.error("[Kepr] Failed to access setNotes:", error)
         resolve()
       }
     })
@@ -156,12 +157,12 @@ export const storageService = {
       try {
         chrome.storage.local.remove([key], () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] clearNotes error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] clearNotes error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access clearNotes:", error)
+        console.error("[Kepr] Failed to access clearNotes:", error)
         resolve()
       }
     })
@@ -170,24 +171,24 @@ export const storageService = {
   /**
    * Retrieves user GitHub settings.
    */
-  async getGitHubSettings(): Promise<GitHubSettings | null> {
+  async getGitHubSettings(): Promise<GitHubSettings> {
     if (!isExtensionContextActive()) {
-      return mockStore[STORAGE_KEYS.GITHUB_SETTINGS] || null
+      return mockStore[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS
     }
 
     return new Promise((resolve) => {
       try {
         chrome.storage.local.get([STORAGE_KEYS.GITHUB_SETTINGS], (result) => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] getGitHubSettings error:", chrome.runtime.lastError.message)
-            resolve(null)
+            console.error("[Kepr] getGitHubSettings error:", chrome.runtime.lastError.message)
+            resolve(DEFAULT_GITHUB_SETTINGS)
           } else {
-            resolve(result[STORAGE_KEYS.GITHUB_SETTINGS] || null)
+            resolve(result[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS)
           }
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access getGitHubSettings:", error)
-        resolve(null)
+        console.error("[Kepr] Failed to access getGitHubSettings:", error)
+        resolve(DEFAULT_GITHUB_SETTINGS)
       }
     })
   },
@@ -206,12 +207,12 @@ export const storageService = {
       try {
         chrome.storage.local.set({ [STORAGE_KEYS.GITHUB_SETTINGS]: settings }, () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] setGitHubSettings error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] setGitHubSettings error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access setGitHubSettings:", error)
+        console.error("[Kepr] Failed to access setGitHubSettings:", error)
         resolve()
       }
     })
@@ -230,14 +231,14 @@ export const storageService = {
       try {
         chrome.storage.local.get([key], (result) => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] getActiveSession error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] getActiveSession error:", chrome.runtime.lastError.message)
             resolve(null)
           } else {
             resolve(result[key] || null)
           }
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access getActiveSession:", error)
+        console.error("[Kepr] Failed to access getActiveSession:", error)
         resolve(null)
       }
     })
@@ -258,12 +259,12 @@ export const storageService = {
       try {
         chrome.storage.local.set({ [key]: session }, () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] setActiveSession error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] setActiveSession error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access setActiveSession:", error)
+        console.error("[Kepr] Failed to access setActiveSession:", error)
         resolve()
       }
     })
@@ -284,12 +285,12 @@ export const storageService = {
       try {
         chrome.storage.local.remove([key], () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] clearActiveSession error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] clearActiveSession error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access clearActiveSession:", error)
+        console.error("[Kepr] Failed to access clearActiveSession:", error)
         resolve()
       }
     })
@@ -307,14 +308,14 @@ export const storageService = {
       try {
         chrome.storage.local.get([STORAGE_KEYS.CURRENT_PROBLEM], (result) => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] getCurrentProblem error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] getCurrentProblem error:", chrome.runtime.lastError.message)
             resolve(null)
           } else {
             resolve(result[STORAGE_KEYS.CURRENT_PROBLEM] || null)
           }
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access getCurrentProblem:", error)
+        console.error("[Kepr] Failed to access getCurrentProblem:", error)
         resolve(null)
       }
     })
@@ -334,12 +335,12 @@ export const storageService = {
       try {
         chrome.storage.local.set({ [STORAGE_KEYS.CURRENT_PROBLEM]: problem }, () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] setCurrentProblem error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] setCurrentProblem error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access setCurrentProblem:", error)
+        console.error("[Kepr] Failed to access setCurrentProblem:", error)
         resolve()
       }
     })
@@ -358,14 +359,14 @@ export const storageService = {
       try {
         chrome.storage.local.get([key], (result) => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] getSyncStatus error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] getSyncStatus error:", chrome.runtime.lastError.message)
             resolve(null)
           } else {
             resolve(result[key] || null)
           }
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access getSyncStatus:", error)
+        console.error("[Kepr] Failed to access getSyncStatus:", error)
         resolve(null)
       }
     })
@@ -387,12 +388,12 @@ export const storageService = {
       try {
         chrome.storage.local.set({ [key]: payload }, () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] setSyncStatus error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] setSyncStatus error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access setSyncStatus:", error)
+        console.error("[Kepr] Failed to access setSyncStatus:", error)
         resolve()
       }
     })
@@ -411,14 +412,14 @@ export const storageService = {
       try {
         chrome.storage.local.get([key], (result) => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] getLastSyncMetadata error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] getLastSyncMetadata error:", chrome.runtime.lastError.message)
             resolve(null)
           } else {
             resolve(result[key] || null)
           }
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access getLastSyncMetadata:", error)
+        console.error("[Kepr] Failed to access getLastSyncMetadata:", error)
         resolve(null)
       }
     })
@@ -439,12 +440,12 @@ export const storageService = {
       try {
         chrome.storage.local.set({ [key]: metadata }, () => {
           if (chrome.runtime.lastError) {
-            console.error("[LeetPush] setLastSyncMetadata error:", chrome.runtime.lastError.message)
+            console.error("[Kepr] setLastSyncMetadata error:", chrome.runtime.lastError.message)
           }
           resolve()
         })
       } catch (error) {
-        console.error("[LeetPush] Failed to access setLastSyncMetadata:", error)
+        console.error("[Kepr] Failed to access setLastSyncMetadata:", error)
         resolve()
       }
     })
@@ -462,7 +463,7 @@ export const storageService = {
         chrome.storage.onChanged.addListener(chromeStorageChangeListener)
         isChromeListenerRegistered = true
       } catch (error) {
-        console.error("[LeetPush] Failed to attach chrome storage listener:", error)
+        console.error("[Kepr] Failed to attach chrome storage listener:", error)
       }
     }
 
@@ -484,7 +485,7 @@ export const storageService = {
         try {
           chrome.storage.onChanged.removeListener(chromeStorageChangeListener)
         } catch (error) {
-          console.error("[LeetPush] Failed to detach chrome storage listener:", error)
+          console.error("[Kepr] Failed to detach chrome storage listener:", error)
         }
       }
       isChromeListenerRegistered = false
@@ -492,12 +493,12 @@ export const storageService = {
   },
 
   // Helper to trigger mock local callback loops
-  private triggerMockChange(changes: Record<string, any>) {
+  triggerMockChange(changes: Record<string, any>) {
     changeCallbacks.forEach((cb) => {
       try {
         cb(changes)
       } catch (err) {
-        console.error("[LeetPush] Error in mock storage change callback:", err)
+        console.error("[Kepr] Error in mock storage change callback:", err)
       }
     })
   }

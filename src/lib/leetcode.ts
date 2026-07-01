@@ -40,7 +40,7 @@ export function getRawQuestionData(): any {
     
     return questionQuery?.state?.data?.question || null
   } catch (error) {
-    console.error("[LeetPush] Error parsing LeetCode __NEXT_DATA__:", error)
+    console.error("[Kepr] Error parsing LeetCode __NEXT_DATA__:", error)
     return null
   }
 }

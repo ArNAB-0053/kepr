@@ -2,7 +2,7 @@ import { storageService } from "~lib/storage/storage.service"
 import { githubService } from "~lib/github/github.service"
 import { buildSubmissionMetadata } from "~lib/leetcode/extractMetadata"
 
-console.log("[LeetPush] Background worker initialized 🚀")
+console.log("[Kepr] Background worker initialized 🚀")
 
 /**
  * Event listener: Handles incoming messages from content scripts.
@@ -30,13 +30,13 @@ async function handleSubmissionSave(
   notes: string
 ) {
   const slug = problemData.slug
-  console.log(`[LeetPush] Background worker starting sync for: ${problemData.title}`)
+  console.log(`[Kepr] Background worker starting sync for: ${problemData.title}`)
 
   try {
     // 1. Fetch GitHub settings
     const settings = await storageService.getGitHubSettings()
-    if (!settings || !settings.isConfigured || !settings.pat || !settings.repo) {
-      console.warn("[LeetPush] GitHub settings are missing or unconfigured.")
+    if (!settings.isConfigured || !settings.pat || !settings.repo) {
+      console.warn("[Kepr] GitHub settings are missing or unconfigured.")
       await storageService.setSyncStatus(
         slug,
         "error",
@@ -62,16 +62,16 @@ async function handleSubmissionSave(
     const result = await githubService.pushSubmission(settings, metadata, code, notes)
 
     if (result.success) {
-      console.log(`[LeetPush] Successfully pushed solution for "${problemData.title}" to GitHub!`)
+      console.log(`[Kepr] Successfully pushed solution for "${problemData.title}" to GitHub!`)
       // Cache the sync details and update status
       await storageService.setLastSyncMetadata(slug, metadata)
       await storageService.setSyncStatus(slug, "saved")
     } else {
-      console.error(`[LeetPush] Failed to push solution: ${result.error}`)
+      console.error(`[Kepr] Failed to push solution: ${result.error}`)
       await storageService.setSyncStatus(slug, "error", result.error || "GitHub commit failed.")
     }
   } catch (error: any) {
-    console.error("[LeetPush] Unexpected error in background worker sync:", error)
+    console.error("[Kepr] Unexpected error in background worker sync:", error)
     await storageService.setSyncStatus(slug, "error", error.message || "An unexpected error occurred during sync.")
   }
 }

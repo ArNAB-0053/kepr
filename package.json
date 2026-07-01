@@ -1,8 +1,8 @@
 {
-  "name": "leet-push",
-  "displayName": "Leet push",
+  "name": "kepr",
+  "displayName": "Kepr",
   "version": "0.0.1",
-  "description": "Save accepted LeetCode solutions directly to GitHub.",
+  "description": "Automatically save accepted coding solutions, metadata, notes, and progress to GitHub.",
   "author": "Arnab Bhattacharyya",
   "scripts": {
     "dev": "plasmo dev",
