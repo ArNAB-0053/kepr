@@ -3,6 +3,7 @@ import { GitHubSettings } from "../components/GitHubSettings"
 import { storageService } from "~lib/storage/storage.service"
 import { githubService } from "~lib/github/github.service"
 import type { GitHubSettings as SettingsType } from "~lib/types/settings"
+import { DEFAULT_GITHUB_SETTINGS } from "~lib/constants/settings"
 import { Loader } from "lucide-react"
 
 /**
@@ -10,16 +11,30 @@ import { Loader } from "lucide-react"
  * Manages loading/persisting settings and invoking credentials validation services.
  */
 export const Settings: React.FC = () => {
-  const [settings, setSettings] = useState<SettingsType | null>(null)
+  const [settings, setSettings] = useState<SettingsType>(DEFAULT_GITHUB_SETTINGS)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
+
     const loadSettings = async () => {
-      const currentSettings = await storageService.getGitHubSettings()
-      if (mounted)
-        setSettings(currentSettings)
+      try {
+        const currentSettings = await storageService.getGitHubSettings()
+
+        if (mounted) {
+          setSettings(currentSettings)
+        }
+      } catch (error) {
+        console.error("Error loading settings:", error)
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
     }
+
     loadSettings()
+
     return () => {
       mounted = false
     }
@@ -46,7 +61,7 @@ export const Settings: React.FC = () => {
     }
   }
 
-  if (!settings) {
+  if (isLoading) {
     return (
       <div className="p-4 text-xs text-muted-foreground flex flex-col items-center justify-center mt-28">
         <Loader className="animate-spin h-6 w-6 inline-block" />

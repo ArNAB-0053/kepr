@@ -52,9 +52,7 @@ export const Home: React.FC = () => {
       try {
         // 1. Load GitHub settings
         const settings = await storageService.getGitHubSettings()
-        if (settings) {
-          setIsConfigured(settings.isConfigured)
-        }
+        setIsConfigured(settings.isConfigured)
 
         // 2. Load active problem
         const currentProb = await storageService.getCurrentProblem()

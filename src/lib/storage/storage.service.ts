@@ -1,6 +1,7 @@
 import type { GitHubSettings } from "../types/settings"
 import type { ProblemData } from "../types/problem"
 import type { SubmissionMetadata } from "../types/metadata"
+import { DEFAULT_GITHUB_SETTINGS } from "../constants/settings"
 
 export interface ActiveSession {
   startedAt: string
@@ -170,9 +171,9 @@ export const storageService = {
   /**
    * Retrieves user GitHub settings.
    */
-  async getGitHubSettings(): Promise<GitHubSettings | null> {
+  async getGitHubSettings(): Promise<GitHubSettings> {
     if (!isExtensionContextActive()) {
-      return mockStore[STORAGE_KEYS.GITHUB_SETTINGS] || null
+      return mockStore[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS
     }
 
     return new Promise((resolve) => {
@@ -180,14 +181,14 @@ export const storageService = {
         chrome.storage.local.get([STORAGE_KEYS.GITHUB_SETTINGS], (result) => {
           if (chrome.runtime.lastError) {
             console.error("[LeetPush] getGitHubSettings error:", chrome.runtime.lastError.message)
-            resolve(null)
+            resolve(DEFAULT_GITHUB_SETTINGS)
           } else {
-            resolve(result[STORAGE_KEYS.GITHUB_SETTINGS] || null)
+            resolve(result[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS)
           }
         })
       } catch (error) {
         console.error("[LeetPush] Failed to access getGitHubSettings:", error)
-        resolve(null)
+        resolve(DEFAULT_GITHUB_SETTINGS)
       }
     })
   },
@@ -492,7 +493,7 @@ export const storageService = {
   },
 
   // Helper to trigger mock local callback loops
-  private triggerMockChange(changes: Record<string, any>) {
+  triggerMockChange(changes: Record<string, any>) {
     changeCallbacks.forEach((cb) => {
       try {
         cb(changes)

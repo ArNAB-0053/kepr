@@ -35,7 +35,7 @@ async function handleSubmissionSave(
   try {
     // 1. Fetch GitHub settings
     const settings = await storageService.getGitHubSettings()
-    if (!settings || !settings.isConfigured || !settings.pat || !settings.repo) {
+    if (!settings.isConfigured || !settings.pat || !settings.repo) {
       console.warn("[LeetPush] GitHub settings are missing or unconfigured.")
       await storageService.setSyncStatus(
         slug,

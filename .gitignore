@@ -27,7 +27,7 @@ build/
 dist/
 
 # plasmo
-.plasmo
+*.plasmo
 
 # typescript
-.tsbuildinfo
+*.tsbuildinfo

@@ -3,7 +3,7 @@ import { Eye, EyeOff, Key, FolderGit2, FolderClosed, CheckCircle2, XCircle, Refr
 import type { GitHubSettings as SettingsType } from "~lib/types/settings"
 
 interface GitHubSettingsProps {
-  initialSettings: SettingsType | null
+  initialSettings: SettingsType
   onSave: (settings: SettingsType) => void
   onTestConnection: (pat: string, repo: string) => Promise<{ success: boolean; error?: string }>
 }
@@ -26,11 +26,9 @@ export const GitHubSettings: React.FC<GitHubSettingsProps> = ({
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved">("idle")
 
   useEffect(() => {
-    if (initialSettings) {
-      setPat(initialSettings.pat || "")
-      setRepo(initialSettings.repo || "")
-      setRootPath(initialSettings.rootPath || "DSA/LeetCode")
-    }
+    setPat(initialSettings.pat)
+    setRepo(initialSettings.repo)
+    setRootPath(initialSettings.rootPath)
   }, [initialSettings])
 
   const handleSave = () => {
