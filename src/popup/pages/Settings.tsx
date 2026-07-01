@@ -7,7 +7,7 @@ import { DEFAULT_GITHUB_SETTINGS } from "~lib/constants/settings"
 import { Loader } from "lucide-react"
 
 /**
- * Settings configuration screen for LeetPush.
+ * Settings configuration screen for Kepr.
  * Manages loading/persisting settings and invoking credentials validation services.
  */
 export const Settings: React.FC = () => {

@@ -26,7 +26,7 @@ let onCodeExtracted: ((payload: { code: string; language: string }) => void) | n
  * Handles Monaco editor value extraction and active language updates.
  */
 window.addEventListener("message", (event) => {
-  if (event.source !== window || !event.data || event.data.source !== "leetpush-main") {
+  if (event.source !== window || !event.data || event.data.source !== "kepr-main") {
     return
   }
 
@@ -40,7 +40,7 @@ window.addEventListener("message", (event) => {
     if (currentProblemData && currentProblemData.language !== event.data.language) {
       currentProblemData.language = event.data.language
       storageService.setCurrentProblem(currentProblemData)
-      console.log(`[LeetPush] Language updated for ${currentProblemData.slug}: ${event.data.language}`)
+      console.log(`[Kepr] Language updated for ${currentProblemData.slug}: ${event.data.language}`)
     }
   }
 })
@@ -62,7 +62,7 @@ async function initializeProblemPage() {
   stopObservation()
   isSubmitting = false
 
-  console.log("[LeetPush] Initializing problem page tracking...")
+  console.log("[Kepr] Initializing problem page tracking...")
 
   // Extract problem metadata (asynchronously handles GraphQL SPA fallbacks)
   const problem = await getProblemData()
@@ -86,7 +86,7 @@ async function initializeProblemPage() {
   await activeTracker.init()
 
   // Query editor language immediately on load
-  window.postMessage({ source: "leetpush-isolated", type: "GET_CURRENT_LANGUAGE" }, "*")
+  window.postMessage({ source: "kepr-isolated", type: "GET_CURRENT_LANGUAGE" }, "*")
 }
 
 /**
@@ -105,7 +105,7 @@ function startObservation() {
 
     // 2. Submission accepted!
     if (detectAcceptedState()) {
-      console.log("[LeetPush] Submission ACCEPTED! Initiating sync process...")
+      console.log("[Kepr] Submission ACCEPTED! Initiating sync process...")
       isSubmitting = false
       stopObservation()
       
@@ -118,7 +118,7 @@ function startObservation() {
         
         const { code, language } = payload
         if (!code) {
-          console.error("[LeetPush] Failed to extract solution code from editor.")
+          console.error("[Kepr] Failed to extract solution code from editor.")
           await storageService.setSyncStatus(
             currentProblemData.slug,
             "error",
@@ -156,13 +156,13 @@ function startObservation() {
       }
 
       // Query editor code from the MAIN world content script
-      window.postMessage({ source: "leetpush-isolated", type: "GET_CODE_AND_LANG" }, "*")
+      window.postMessage({ source: "kepr-isolated", type: "GET_CODE_AND_LANG" }, "*")
       return
     }
 
     // 3. Submission failed (Wrong Answer, TLE, MLE, etc.)
     if (detectFailedState()) {
-      console.log("[LeetPush] Submission evaluation failed. Halting sync observation.")
+      console.log("[Kepr] Submission evaluation failed. Halting sync observation.")
       isSubmitting = false
       stopObservation()
     }
@@ -209,7 +209,7 @@ window.addEventListener("beforeunload", () => {
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "MANUAL_SYNC_TRIGGER" && currentProblemData && activeTracker) {
-    console.log("[LeetPush] Manual sync triggered from popup!")
+    console.log("[Kepr] Manual sync triggered from popup!")
     isSubmitting = false // Reset standard observation
     stopObservation()
     
@@ -255,7 +255,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       // Dispatch request to MAIN world script to fetch code
-      window.postMessage({ source: "leetpush-isolated", type: "GET_CODE_AND_LANG" }, "*")
+      window.postMessage({ source: "kepr-isolated", type: "GET_CODE_AND_LANG" }, "*")
     })
   }
 })
@@ -266,6 +266,6 @@ setInterval(() => {
     initializeProblemPage()
   } else if (currentProblemData) {
     // Keep language updated if user changes editor settings
-    window.postMessage({ source: "leetpush-isolated", type: "GET_CURRENT_LANGUAGE" }, "*")
+    window.postMessage({ source: "kepr-isolated", type: "GET_CURRENT_LANGUAGE" }, "*")
   }
 }, 1000)

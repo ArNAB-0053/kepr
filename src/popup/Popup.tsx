@@ -5,7 +5,7 @@ import Settings from "./pages/Settings"
 import "~style.css"
 
 /**
- * Main layout entry point for the LeetPush popup panel.
+ * Main layout entry point for the Kepr popup panel.
  * Enforces standard dimensions for Chrome Extension compatibility and handles simple tab routing.
  */
 function IndexPopup() {

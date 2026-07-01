@@ -26,7 +26,7 @@ export function getRawQuestionData(): any {
     
     return questionQuery?.state?.data?.question || null
   } catch (error) {
-    console.error("[LeetPush] Error parsing __NEXT_DATA__:", error)
+    console.error("[Kepr] Error parsing __NEXT_DATA__:", error)
     return null
   }
 }
@@ -121,7 +121,7 @@ export async function getProblemData(): Promise<ProblemData | null> {
       return formatProblem(gqlQuestion)
     }
   } catch (error) {
-    console.error("[LeetPush] Failed to resolve problem via GraphQL:", error)
+    console.error("[Kepr] Failed to resolve problem via GraphQL:", error)
   }
 
   return null

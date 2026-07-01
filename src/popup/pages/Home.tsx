@@ -71,7 +71,7 @@ export const Home: React.FC = () => {
           setNotes(userNotes)
         }
       } catch (error) {
-        console.error("[LeetPush] Error loading initial storage data in Home popup:", error)
+        console.error("[Kepr] Error loading initial storage data in Home popup:", error)
         if (error instanceof Error && error.message.includes("Extension context invalidated")) {
           setIsContextInvalidated(true)
         }
@@ -97,7 +97,7 @@ export const Home: React.FC = () => {
           setIsConfigured(settings?.isConfigured || false)
         }
       } catch (error) {
-        console.error("[LeetPush] Error in storage change listener:", error)
+        console.error("[Kepr] Error in storage change listener:", error)
         if (error instanceof Error && error.message.includes("Extension context invalidated")) {
           setIsContextInvalidated(true)
         }
@@ -124,7 +124,7 @@ export const Home: React.FC = () => {
         const userNotes = await storageService.getNotes(problem.slug)
         setNotes(userNotes)
       } catch (error) {
-        console.error("[LeetPush] Error fetching problem details from storage:", error)
+        console.error("[Kepr] Error fetching problem details from storage:", error)
         if (error instanceof Error && error.message.includes("Extension context invalidated")) {
           setIsContextInvalidated(true)
         }
@@ -166,7 +166,7 @@ export const Home: React.FC = () => {
 
     try {
       if (!isExtensionContextActive()) {
-        console.warn("[LeetPush] Cannot run manual sync: extension context is inactive.")
+        console.warn("[Kepr] Cannot run manual sync: extension context is inactive.")
         alert("Action unavailable: Popup is running outside of the extension runtime.")
         return
       }
@@ -178,14 +178,14 @@ export const Home: React.FC = () => {
             chrome.tabs.sendMessage(activeTab.id, { type: "MANUAL_SYNC_TRIGGER" })
           }
         } catch (err) {
-          console.error("[LeetPush] Failed to send manual sync message:", err)
+          console.error("[Kepr] Failed to send manual sync message:", err)
           if (err instanceof Error && err.message.includes("Extension context invalidated")) {
             setIsContextInvalidated(true)
           }
         }
       })
     } catch (error) {
-      console.error("[LeetPush] Failed to query tabs for manual sync:", error)
+      console.error("[Kepr] Failed to query tabs for manual sync:", error)
       if (error instanceof Error && error.message.includes("Extension context invalidated")) {
         setIsContextInvalidated(true)
       }
@@ -202,14 +202,14 @@ export const Home: React.FC = () => {
         <div className="space-y-2">
           <h3 className="text-sm font-bold text-foreground">Extension Context Invalidated</h3>
           <p className="text-[10px] text-muted-foreground leading-normal max-w-[240px] mx-auto">
-            LeetPush was recently updated or reloaded in the background. Stale connections are disconnected.
+            Kepr was recently updated or reloaded in the background. Stale connections are disconnected.
           </p>
           <div className="p-3 bg-secondary rounded-lg border border-border text-[10px] text-left text-muted-foreground space-y-1.5 mt-4">
             <p className="font-bold text-foreground">To resolve this:</p>
             <ol className="list-decimal pl-4 space-y-1">
               <li>Close this popup panel.</li>
               <li>Refresh your active LeetCode browser tab.</li>
-              <li>Re-open the LeetPush extension popup.</li>
+              <li>Re-open the Kepr extension popup.</li>
             </ol>
           </div>
         </div>

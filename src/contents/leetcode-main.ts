@@ -16,7 +16,7 @@ export const config: PlasmoCSConfig = {
  */
 window.addEventListener("message", (event) => {
   // Security check: only respond to messages originating from the same page window
-  if (event.source !== window || !event.data || event.data.source !== "leetpush-isolated") {
+  if (event.source !== window || !event.data || event.data.source !== "kepr-isolated") {
     return
   }
 
@@ -32,19 +32,19 @@ window.addEventListener("message", (event) => {
 
         // Send results back to the ISOLATED world content script
         window.postMessage({
-          source: "leetpush-main",
+          source: "kepr-main",
           type: "SEND_CODE_AND_LANG",
           payload: { code, language }
         }, "*")
         return
       }
     } catch (error) {
-      console.error("[LeetPush] Error reading Monaco Editor in MAIN world:", error)
+      console.error("[Kepr] Error reading Monaco Editor in MAIN world:", error)
     }
 
     // Return empty payload fallback
     window.postMessage({
-      source: "leetpush-main",
+      source: "kepr-main",
       type: "SEND_CODE_AND_LANG",
       payload: { code: "", language: "" }
     }, "*")
@@ -58,19 +58,19 @@ window.addEventListener("message", (event) => {
         const language = model ? model.getLanguageId() : "unknown"
 
         window.postMessage({
-          source: "leetpush-main",
+          source: "kepr-main",
           type: "SEND_CURRENT_LANGUAGE",
           language
         }, "*")
         return
       }
     } catch (error) {
-      console.error("[LeetPush] Error reading Monaco Editor language in MAIN world:", error)
+      console.error("[Kepr] Error reading Monaco Editor language in MAIN world:", error)
     }
 
     // Fallback if editor not ready/accessible
     window.postMessage({
-      source: "leetpush-main",
+      source: "kepr-main",
       type: "SEND_CURRENT_LANGUAGE",
       language: "unknown"
     }, "*")
