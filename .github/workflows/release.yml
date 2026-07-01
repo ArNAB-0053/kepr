@@ -1,45 +1,61 @@
-name: Release Extension
+name: Release Please
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
-  release:
+  release-please:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
         with:
-          node-version: 22
+          release-type: node
+
+      # Below steps run ONLY when a new Release is created (i.e. Release PR is merged)
+      - name: Checkout repository at tag
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag_name }}
 
       - name: Setup pnpm
+        if: ${{ steps.release.outputs.release_created }}
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
+      - name: Setup Node.js
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
       - name: Install dependencies
+        if: ${{ steps.release.outputs.release_created }}
         run: pnpm install --frozen-lockfile
 
       - name: Build extension
+        if: ${{ steps.release.outputs.release_created }}
         run: pnpm build
 
       - name: Create release archive
+        if: ${{ steps.release.outputs.release_created }}
         run: |
           cd build/chrome-mv3-prod
-          zip -r ../../kepr-${{ github.ref_name }}.zip .
+          zip -r ../../kepr-${{ steps.release.outputs.tag_name }}.zip .
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-          files: |
-            kepr-${{ github.ref_name }}.zip
+      - name: Upload Release Asset
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ steps.release.outputs.tag_name }} kepr-${{ steps.release.outputs.tag_name }}.zip --clobber
