@@ -4,8 +4,6 @@
 
 Kepr is a lightweight, modern browser extension that automatically saves your accepted coding solutions, submission metadata, revision notes, and progress directly to a GitHub repository of your choice.
 
-![Kepr Extension Banner](assets/screenshots/banner.png)
-
 ---
 
 ## Features
