@@ -49,11 +49,11 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: |
           cd build/chrome-mv3-prod
-          zip -r ../../kepr-${{ steps.release.outputs.tag_name }}.zip .
+          zip -r ../../${{ steps.release.outputs.tag_name }}.zip .
 
       - name: Upload Release Asset
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${{ steps.release.outputs.tag_name }} kepr-${{ steps.release.outputs.tag_name }}.zip --clobber
+          gh release upload ${{ steps.release.outputs.tag_name }} ${{ steps.release.outputs.tag_name }}.zip --clobber
