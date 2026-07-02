@@ -1,7 +1,7 @@
 {
   "name": "kepr",
   "displayName": "Kepr",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "description": "Automatically save accepted coding solutions, metadata, notes, and progress to GitHub.",
   "author": "Arnab Bhattacharyya",
   "scripts": {
