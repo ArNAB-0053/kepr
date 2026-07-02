@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0](https://github.com/ArNAB-0053/kepr/compare/kepr-v1.0.0...kepr-v1.0.0) (2026-07-02)
 
 
+### Infrastructure
+
+* release 1.0.0 ([4ac7bf8](https://github.com/ArNAB-0053/kepr/commit/4ac7bf8b11481e32f636e998bdf73a18ef981e25))
+
+## [1.0.0](https://github.com/ArNAB-0053/kepr/compare/kepr-v1.0.0...kepr-v1.0.0) (2026-07-02)
+
+
 ### Added
 
 * add markdown preview functionality and styles ([c189a91](https://github.com/ArNAB-0053/kepr/commit/c189a9132e3b4309309bd8d818428518ab5483c0))
