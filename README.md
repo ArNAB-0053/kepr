@@ -4,6 +4,8 @@
 
 Automatically sync accepted coding solutions, notes, and metadata to GitHub.
 
+![Kepr Extension Banner](assets/screenshots/banner.png)
+
 ---
 
 ## Features
