@@ -1,6 +1,8 @@
 import React from "react"
 import { Code2, Settings, Home } from "lucide-react"
 
+import Logo from "~/assets/logo.png"
+
 interface HeaderProps {
   currentPage: "home" | "settings"
   onNavigate: (page: "home" | "settings") => void
@@ -15,7 +17,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
     <header className="flex items-center justify-between border-b border-border bg-card px-4 py-3 select-none">
       <div className="flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-          <Code2 size={18} />
+            <img src={Logo} alt="Kepr Logo" className="h-6 w-6" />
         </div>
         <div>
           <h1 className="text-base font-bold tracking-tight text-foreground">Kepr</h1>

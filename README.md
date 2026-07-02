@@ -2,7 +2,7 @@
 
 > Keep every solution.
 
-Kepr is a lightweight, modern browser extension that automatically saves your accepted coding solutions, submission metadata, revision notes, and progress directly to a GitHub repository of your choice.
+Automatically sync accepted coding solutions, notes, and metadata to GitHub.
 
 ![Kepr Extension Banner](assets/screenshots/banner.png)
 
@@ -13,54 +13,98 @@ Kepr is a lightweight, modern browser extension that automatically saves your ac
 - **Automatic Solution Syncing**: Instantly pushes accepted code submissions to your GitHub repository without interrupting your solving workflow.
 - **GitHub Integration**: Direct communication with the GitHub API using personal access tokens (PAT) for custom repository sync paths.
 - **Problem Notes**: Keep track of key findings, edge cases, and learnings by appending revision notes to each problem path.
-- **Submission Metadata Tracking**: Captures and saves detailed runtime metrics, difficulty, memory, language, runtime, and update timestamps inside a structured `metadata.json` file.
-- **Session Tracking**: Integrates an active tracker measuring actual focus and time spent solving the problem.
-- **Local Storage Fallback**: Gracefully caches configurations and session data in Chrome storage to prevent loss of information when offline or during context invalidation.
-- **Multi-Platform Vision**: Designed with a decoupled architecture to expand beyond LeetCode to other major competitive programming and interview prep platforms in the future.
+- **Submission Metadata Tracking**: Captures and saves detailed runtime metrics, memory usage, language, difficulty, timestamps, and other submission details in a structured `metadata.json` file.
+- **Session Tracking**: Measures active focus time spent solving problems and stores it alongside each solution.
+- **Local Storage Fallback**: Gracefully caches configuration and session data using Chrome storage to prevent data loss.
+- **Future Platform Support**: Built with a modular architecture that can be extended beyond LeetCode to additional coding platforms.
 
 ---
 
 ## Why Kepr?
 
-When practicing coding problems on platforms like LeetCode, it is incredibly easy to lose track of past solutions, custom revision notes, and focus timings. Standard platforms lack automated version control or centralized hosting for personal solutions.
+When practicing coding problems, it is surprisingly easy to lose track of previous solutions, revision notes, and learning progress. While coding platforms provide submission history, they are not designed to be a long-term, searchable archive of your journey.
 
-Kepr solves this by acting as a background sync agent. It detects when a submission has been accepted, captures your Monaco editor text, compiles structural metadata, joins any custom revision notes you have written, and commits them all to your personal GitHub repository automatically. This builds an elegant, search-friendly directory of your coding progress.
+Kepr acts as a background sync agent. When an accepted submission is detected, it captures your solution, metadata, notes, and activity information, then automatically commits everything to your personal GitHub repository. Over time, this creates a searchable, version-controlled archive of your coding progress.
 
 ---
 
 ## Installation
 
-1. **Download the Extension**:
-   - Navigate to the [GitHub Releases](https://github.com/your-username/kepr/releases) page.
-   - Download the latest `kepr-<version>.zip` build.
-   - Extract the zip archive locally on your computer.
+### 1. Download the Extension
 
-2. **Load Unpacked Extension**:
-   - Open Google Chrome (or any Chromium-based browser) and navigate to `chrome://extensions/`.
-   - Toggle **Developer Mode** on (usually located in the top-right corner).
-   - Click the **Load unpacked** button in the top-left corner.
-   - Select the extracted folder containing the extension build (e.g., `chrome-mv3-prod` or `chrome-mv3-dev`).
+- Visit the [Releases](https://github.com/ArNAB-0053/kepr/releases) page.
+- Download the latest `kepr-<version>.zip` archive.
+- Extract the archive locally.
 
-3. **Open Settings**:
-   - Click the Kepr extension icon in your toolbar to open the settings panel.
+### 2. Load the Extension
+
+1. Open Chrome (or any Chromium-based browser).
+2. Navigate to:
+
+   ```
+   chrome://extensions/
+   ```
+
+3. Enable **Developer Mode**.
+4. Click **Load unpacked**.
+5. Select the extracted extension folder.
+
+### 3. Open Settings
+
+Click the Kepr icon from the browser toolbar to open the settings panel.
 
 ---
 
 ## Configuration
 
-To sync solutions to your repository, Kepr requires a brief configuration:
+Kepr requires a one-time setup before syncing solutions.
 
-1. **Generate GitHub PAT (Personal Access Token)**:
-   - Go to your GitHub account settings: **Settings > Developer Settings > Personal Access Tokens > Fine-grained tokens** (or classic tokens).
-   - Generate a new token with repository access scopes enabled: write permissions for **Contents**.
-   
-2. **Configure Repository**:
-   - Enter your token and repository string in the format: `owner/repository-name` (e.g. `octocat/my-solutions`).
-   - Click **Test Connection** to verify permissions and API access.
+### Generate a GitHub Personal Access Token
 
-3. **Configure Root Path**:
-   - Specify a directory inside your repository (e.g. `DSA/LeetCode` or `Solutions`). If left empty, Kepr will sync folders straight to the root of your repository.
-   - Click **Save Settings** to persist the configuration.
+1. Open GitHub Settings.
+2. Navigate to:
+
+   ```
+   Developer Settings
+   → Personal Access Tokens
+   → Fine-grained Tokens
+   ```
+
+3. Create a token with repository content read/write permissions.
+
+### Configure Repository
+
+Enter your repository in the following format:
+
+```text
+owner/repository-name
+```
+
+Example:
+
+```text
+octocat/my-solutions
+```
+
+Click **Test Connection** to verify access.
+
+### Configure Root Path
+
+Optionally specify a directory inside your repository:
+
+```text
+DSA/LeetCode
+```
+
+or
+
+```text
+Solutions
+```
+
+If left empty, solutions will be synced directly to the repository root.
+
+Click **Save Settings** to persist the configuration.
 
 ![Kepr Settings UI](assets/screenshots/settings.png)
 
@@ -68,80 +112,119 @@ To sync solutions to your repository, Kepr requires a brief configuration:
 
 ## Development
 
-Kepr is built using the **Plasmo** framework for robust cross-browser extension development, combined with **React** and **TypeScript**.
+Kepr is built with:
 
-### Prerequisite
+- Plasmo
+- React
+- TypeScript
+- Tailwind CSS
+- Chrome Extension APIs
 
-Ensure you have [Node.js v22+](https://nodejs.org) and [pnpm](https://pnpm.io) installed.
+### Prerequisites
 
-### Setup & Dev Server
+- Node.js v22+
+- pnpm
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/your-username/kepr.git
-   cd kepr
-   ```
+### Setup
 
-2. Install dependencies:
-   ```bash
-   pnpm install
-   ```
+Clone the repository:
 
-3. Run the development server:
-   ```bash
-   pnpm dev
-   ```
+```bash
+git clone https://github.com/ArNAB-0053/kepr.git
+cd kepr
+```
 
-4. Load the development build in Chrome:
-   - Navigate to `chrome://extensions/`.
-   - Click **Load unpacked** and select the `./build/chrome-mv3-dev` directory.
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Start the development server:
+
+```bash
+pnpm dev
+```
+
+Load the generated development build:
+
+```text
+build/chrome-mv3-dev
+```
+
+through Chrome's **Load unpacked** option.
 
 ### Production Build
 
-Create a production-ready package:
+Generate a production-ready extension:
+
 ```bash
 pnpm build
 ```
-This compiles the code and outputs a production folder structure in `./build/chrome-mv3-prod`, ready for compression and hosting.
+
+Output:
+
+```text
+build/chrome-mv3-prod
+```
+
+This folder can be packaged and distributed manually or attached to GitHub Releases.
 
 ---
 
 ## Project Structure
 
 ```text
-├── assets/                  # Design assets, logos, and extension icons
-├── build/                   # Compiled outputs (ignored in git)
+├── assets/                  # Logos, icons, screenshots, design assets
+├── build/                   # Generated builds (ignored by Git)
 ├── src/
-│   ├── background/          # Background worker coordinating GitHub operations
-│   ├── contents/            # Content scripts observing DOM updates & editor states
+│   ├── background/          # Background service worker
+│   ├── contents/            # Content scripts and page observers
 │   ├── lib/
-│   │   ├── constants/       # Global constants (e.g. default settings)
-│   │   ├── github/          # GitHub Rest API services
-│   │   ├── leetcode/        # Active tracker timers & Next.js GraphQL parsing logic
-│   │   ├── storage/         # Local chrome.storage abstraction layer
-│   │   └── types/           # Core TypeScript type definitions
-│   └── popup/               # Popup page layout and UI forms
-├── package.json             # Build dependencies and Plasmo configuration
-└── tsconfig.json            # TypeScript settings and alias paths
+│   │   ├── constants/       # Shared constants
+│   │   ├── github/          # GitHub API integration
+│   │   ├── leetcode/        # Platform-specific logic
+│   │   ├── storage/         # Chrome storage abstraction
+│   │   └── types/           # TypeScript definitions
+│   └── popup/               # Extension popup UI
+├── package.json
+└── tsconfig.json
 ```
 
 ---
 
 ## Roadmap
 
-- **Additional Coding Platforms**: Extend support to platforms like HackerRank, Codeforces, and GeeksforGeeks.
-- **Better Metadata Tracking**: Sync memory and runtime performance percentiles, constraints, and tags.
-- **Repository Templates**: Automatically initialize a clean landing page (`README.md`) inside the GitHub repository summarizing synced progress.
-- **Enhanced Analytics**: Add visual charts of problem difficulties, languages used, and active solving streaks in the extension popup.
+- Support additional coding platforms (Codeforces, HackerRank, GeeksforGeeks, etc.)
+- Enhanced metadata tracking and analytics
+- Repository bootstrap templates
+- Progress dashboards and insights
+- Better activity and revision tracking
+- Cross-browser support
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please feel free to open issues or submit pull requests to help improve the project.
+Contributions are welcome.
+
+If you would like to contribute:
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Make your changes.
+4. Submit a pull request.
+
+Please use Conventional Commits whenever possible:
+
+```text
+feat: add Codeforces support
+fix: prevent duplicate syncs
+docs: improve installation guide
+```
 
 ---
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
