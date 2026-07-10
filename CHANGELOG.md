@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/ArNAB-0053/kepr/compare/kepr-v1.0.0...kepr-v1.1.0) (2026-07-10)
+
+
+### Added
+
+* add support for GeeksForGeeks platform integration and enhance existing features ([8e12922](https://github.com/ArNAB-0053/kepr/commit/8e12922042b0035f2294655913c02608d66d2865))
+* enhance directory configuration for LeetCode and GeeksForGeeks in settings ([3a226c3](https://github.com/ArNAB-0053/kepr/commit/3a226c3c76f8f35302dd2a31c99b22e2e3b017de))
+* new feature "geeksforgeeks" added ([25a2f39](https://github.com/ArNAB-0053/kepr/commit/25a2f395636090ef5b4ed863020b9919d1ef3128))
+
 ## [1.0.0](https://github.com/ArNAB-0053/kepr/compare/kepr-v1.0.0...kepr-v1.0.0) (2026-07-02)
 
 ### Infrastructure
