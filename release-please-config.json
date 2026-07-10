@@ -18,7 +18,8 @@
       "exclude-paths": [
         "README.md",
         "docs/**",
-        "LICENSE"
+        "LICENSE",
+        "assets/screenshots/**"
       ]
     }
   }
