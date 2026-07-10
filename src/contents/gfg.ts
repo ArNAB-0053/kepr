@@ -1,30 +1,24 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { LeetCodeAdapter } from "~lib/platforms/leetcode"
+import { GFGAdapter } from "~lib/platforms/geeksforgeeks"
 import { ActivityTracker } from "~lib/leetcode/activityTracker"
 import { storageService } from "~lib/storage/storage.service"
 
-/**
- * Plasmo content script config.
- * Runs in the ISOLATED world (default) which gives us access to Chrome APIs like chrome.runtime.
- */
 export const config: PlasmoCSConfig = {
-  matches: ["https://leetcode.com/problems/*"]
+  matches: [
+    "https://practice.geeksforgeeks.org/problems/*",
+    "https://www.geeksforgeeks.org/problems/*"
+  ]
 }
 
-const adapter = new LeetCodeAdapter()
+const adapter = new GFGAdapter()
 let activeTracker: ActivityTracker | null = null
 let currentProblemData: any = null
 let lastUrl = ""
 let isSubmitting = false
 let observer: MutationObserver | null = null
-
-// Callback placeholder for communicating with MAIN world Monaco extractor
 let onCodeExtracted: ((payload: { code: string; language: string }) => void) | null = null
 
-/**
- * Receives messages from the MAIN world content script.
- * Handles Monaco editor value extraction and active language updates.
- */
+// Listen for messages from the MAIN world content script
 window.addEventListener("message", (event) => {
   if (event.source !== window || !event.data || event.data.source !== "kepr-main") {
     return
@@ -40,21 +34,16 @@ window.addEventListener("message", (event) => {
     if (currentProblemData && currentProblemData.language !== event.data.language) {
       currentProblemData.language = event.data.language
       storageService.setCurrentProblem(currentProblemData)
-      console.log(`[Kepr] Language updated for ${currentProblemData.slug}: ${event.data.language}`)
+      console.log(`[Kepr] Language updated for GFG ${currentProblemData.slug}: ${event.data.language}`)
     }
   }
 })
 
-/**
- * Initializes tracking for the problem page.
- * Loads problem details, sets state, and launches the active solving session timer.
- */
 async function initializeProblemPage() {
   const currentUrl = window.location.href
   if (currentUrl === lastUrl) return
   lastUrl = currentUrl
 
-  // Destroy previous session tracker if moving between problems client-side
   if (activeTracker) {
     activeTracker.destroy()
     activeTracker = null
@@ -62,83 +51,65 @@ async function initializeProblemPage() {
   stopObservation()
   isSubmitting = false
 
-  console.log("[Kepr] Initializing problem page tracking...")
+  console.log("[Kepr] Initializing GFG problem page tracking...")
 
-  // Extract problem metadata (asynchronously handles GraphQL SPA fallbacks)
   const problem = await adapter.getProblemData()
   if (!problem) {
-    // If LeetCode's SPA/React Query state isn't hydrated yet, retry
     setTimeout(initializeProblemPage, 1000)
     return
   }
 
   currentProblemData = problem
   await storageService.setCurrentProblem(problem)
-  
-  // Initialize sync status to "unsaved" if this problem has never been synced
+
   const existingStatus = await storageService.getSyncStatus(problem.slug)
   if (!existingStatus) {
     await storageService.setSyncStatus(problem.slug, "unsaved")
   }
 
-  // Create and initialize focus tracker
   activeTracker = new ActivityTracker(problem.slug)
   await activeTracker.init()
 
-  // Query editor language immediately on load
   window.postMessage({ source: "kepr-isolated", type: "GET_CURRENT_LANGUAGE" }, "*")
 }
 
-/**
- * Starts observing the DOM for submission result updates.
- */
 function startObservation() {
   stopObservation()
-  
+
   observer = new MutationObserver(async () => {
     if (!isSubmitting || !currentProblemData || !activeTracker) return
 
-    // 1. Wait if the submission is currently pending/judging
     if (adapter.detectPendingState()) {
       return
     }
 
-    // 2. Submission accepted!
     if (adapter.detectAcceptedState()) {
-      console.log("[Kepr] Submission ACCEPTED! Initiating sync process...")
+      console.log("[Kepr] GFG Submission ACCEPTED! Initiating sync...")
       isSubmitting = false
       stopObservation()
-      
-      // Update problem status in storage
+
       await storageService.setSyncStatus(currentProblemData.slug, "saving")
 
-      // Define callback to receive code from MAIN world Monaco editor extractor
       onCodeExtracted = async (payload) => {
-        onCodeExtracted = null // Consume callback
-        
+        onCodeExtracted = null
         const { code, language } = payload
         if (!code) {
           console.error("[Kepr] Failed to extract solution code from editor.")
           await storageService.setSyncStatus(
             currentProblemData.slug,
             "error",
-            "Could not read code from Monaco Editor. Try refreshing the page."
+            "Could not read code from Editor. Try refreshing the page."
           )
           return
         }
 
-        // Get final solving statistics
         const session = await activeTracker.getSessionData()
         const solvedAt = new Date().toISOString()
         const duration = Math.round(activeTracker ? await activeTracker.getFinalDuration() : 0)
-
-        // Fetch user's local notes for this problem
         const notes = await storageService.getNotes(currentProblemData.slug)
 
-        // Clear active session since problem is solved
         await storageService.clearActiveSession(currentProblemData.slug)
 
-        // Delegate GitHub push to the background worker (including notes!)
         chrome.runtime.sendMessage({
           type: "SAVE_SUBMISSION",
           payload: {
@@ -155,14 +126,12 @@ function startObservation() {
         })
       }
 
-      // Query editor code from the MAIN world content script
       window.postMessage({ source: "kepr-isolated", type: "GET_CODE_AND_LANG" }, "*")
       return
     }
 
-    // 3. Submission failed (Wrong Answer, TLE, MLE, etc.)
     if (adapter.detectFailedState()) {
-      console.log("[Kepr] Submission evaluation failed. Halting sync observation.")
+      console.log("[Kepr] GFG Submission failed. Halting observation.")
       isSubmitting = false
       stopObservation()
     }
@@ -182,11 +151,15 @@ function stopObservation() {
   }
 }
 
-// Event listener: Watch for clicks on the Submit button
+// Watch for clicks on the Submit button
 document.addEventListener("click", (event) => {
   const target = event.target as HTMLElement
-  const isSubmitBtn = target.closest('button[data-e2e-locator="console-submit-button"]')
-    || (target.tagName === "BUTTON" && target.textContent?.trim() === "Submit")
+  const button = target.closest("button")
+  if (!button) return
+  const btnText = button.textContent?.trim() || ""
+
+  // Match "Submit" button on GFG
+  const isSubmitBtn = /^\s*Submit\s*$/i.test(btnText)
 
   if (isSubmitBtn && currentProblemData) {
     isSubmitting = true
@@ -194,40 +167,33 @@ document.addEventListener("click", (event) => {
   }
 })
 
-// Initialize on page load
 initializeProblemPage()
 
-// Flush active time tracker when navigating away or closing the tab
 window.addEventListener("beforeunload", () => {
   if (activeTracker) {
     activeTracker.destroy()
   }
 })
 
-/**
- * Event listener: Handles manual synchronization triggers sent from the extension popup.
- */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "GET_ACTIVE_PROBLEM") {
     sendResponse({ problem: currentProblemData })
     return true
   }
   if (message.type === "MANUAL_SYNC_TRIGGER" && currentProblemData && activeTracker) {
-    console.log("[Kepr] Manual sync triggered from popup!")
-    isSubmitting = false // Reset standard observation
+    console.log("[Kepr] Manual sync triggered from GFG popup!")
+    isSubmitting = false
     stopObservation()
-    
-    // Trigger sync sequence
+
     storageService.setSyncStatus(currentProblemData.slug, "saving").then(() => {
       onCodeExtracted = async (payload) => {
-        onCodeExtracted = null // Consume callback
-        
+        onCodeExtracted = null
         const { code, language } = payload
         if (!code) {
           await storageService.setSyncStatus(
             currentProblemData.slug,
             "error",
-            "Could not read code from Monaco Editor. Try refreshing the page."
+            "Could not read code from Editor. Try refreshing the page."
           )
           return
         }
@@ -235,11 +201,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const session = await activeTracker.getSessionData()
         const solvedAt = new Date().toISOString()
         const duration = Math.round(activeTracker ? await activeTracker.getFinalDuration() : 0)
-
-        // Fetch user's local notes for this problem
         const notes = await storageService.getNotes(currentProblemData.slug)
 
-        // Clear session since it's saved
         await storageService.clearActiveSession(currentProblemData.slug)
 
         chrome.runtime.sendMessage({
@@ -258,18 +221,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         })
       }
 
-      // Dispatch request to MAIN world script to fetch code
       window.postMessage({ source: "kepr-isolated", type: "GET_CODE_AND_LANG" }, "*")
     })
   }
 })
 
-// Interval loop to monitor client-side Next.js SPA URL changes & query active language
+// Interval loop to monitor client-side SPA URL changes & query active language
 setInterval(() => {
-  if (window.location.href !== lastUrl && window.location.pathname.startsWith("/problems/")) {
+  if (window.location.href !== lastUrl && (window.location.pathname.includes("/problems/"))) {
     initializeProblemPage()
   } else if (currentProblemData) {
-    // Keep language updated if user changes editor settings
     window.postMessage({ source: "kepr-isolated", type: "GET_CURRENT_LANGUAGE" }, "*")
   }
 }, 1000)

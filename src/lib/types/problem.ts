@@ -7,6 +7,8 @@ export interface ProblemData {
   slug: string;        // The URL slug of the problem (e.g., "two-sum")
   difficulty: string;  // The difficulty level (e.g., "Easy", "Medium", "Hard")
   topics: string[];    // Array of topic tags (e.g., ["Array", "Hash Table"])
-  url: string;         // The full LeetCode problem URL
+  companies?: string[]; // Array of company tags (e.g., ["Amazon", "Google"])
+  url: string;         // The full problem URL
   language?: string;   // The currently selected language (e.g., "cpp", "python3")
+  platform: "leetcode" | "geeksforgeeks"; // The source coding platform
 }

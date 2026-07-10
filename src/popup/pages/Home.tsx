@@ -48,6 +48,39 @@ export const Home: React.FC = () => {
     storageService.logDiagnostics()
     setIsMockActive(!isExtensionContextActive())
 
+    const queryActiveTabProblem = () => {
+      if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.query) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          try {
+            const activeTab = tabs[0]
+            if (activeTab && activeTab.id) {
+              chrome.tabs.sendMessage(activeTab.id, { type: "GET_ACTIVE_PROBLEM" }, (response) => {
+                if (chrome.runtime.lastError) {
+                  // Content script not loaded / not a supported page
+                  setProblem(null)
+                  setSyncStatus(null)
+                  setNotes("")
+                } else if (response && response.problem) {
+                  setProblem(response.problem)
+                  storageService.setCurrentProblem(response.problem)
+                } else {
+                  setProblem(null)
+                  setSyncStatus(null)
+                  setNotes("")
+                }
+              })
+            } else {
+              setProblem(null)
+              setSyncStatus(null)
+              setNotes("")
+            }
+          } catch (err) {
+            console.error("[Kepr] Error querying active tab:", err)
+          }
+        })
+      }
+    }
+
     const loadInitialData = async () => {
       try {
         // 1. Load GitHub settings
@@ -55,20 +88,24 @@ export const Home: React.FC = () => {
         setIsConfigured(settings.isConfigured)
 
         // 2. Load active problem
-        const currentProb = await storageService.getCurrentProblem()
-        setProblem(currentProb)
+        if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.query) {
+          queryActiveTabProblem()
+        } else {
+          const currentProb = await storageService.getCurrentProblem()
+          setProblem(currentProb)
 
-        if (currentProb) {
-          // 3. Load sync status
-          const syncState = await storageService.getSyncStatus(currentProb.slug)
-          if (syncState) {
-            setSyncStatus(syncState.status)
-            setErrorMsg(syncState.error || null)
+          if (currentProb) {
+            // 3. Load sync status
+            const syncState = await storageService.getSyncStatus(currentProb.slug)
+            if (syncState) {
+              setSyncStatus(syncState.status)
+              setErrorMsg(syncState.error || null)
+            }
+
+            // 4. Load notes
+            const userNotes = await storageService.getNotes(currentProb.slug)
+            setNotes(userNotes)
           }
-
-          // 4. Load notes
-          const userNotes = await storageService.getNotes(currentProb.slug)
-          setNotes(userNotes)
         }
       } catch (error) {
         console.error("[Kepr] Error loading initial storage data in Home popup:", error)
@@ -104,8 +141,28 @@ export const Home: React.FC = () => {
       }
     })
 
+    // Listen for tab activated and tab updated events
+    const handleTabActivated = () => {
+      queryActiveTabProblem()
+    }
+
+    const handleTabUpdated = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
+      if (changeInfo.status === "complete" || changeInfo.url) {
+        queryActiveTabProblem()
+      }
+    }
+
+    if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.onActivated) {
+      chrome.tabs.onActivated.addListener(handleTabActivated)
+      chrome.tabs.onUpdated.addListener(handleTabUpdated)
+    }
+
     return () => {
       unsubscribe()
+      if (typeof chrome !== "undefined" && chrome.tabs && chrome.tabs.onActivated) {
+        chrome.tabs.onActivated.removeListener(handleTabActivated)
+        chrome.tabs.onUpdated.removeListener(handleTabUpdated)
+      }
     }
   }, [])
 
@@ -208,7 +265,7 @@ export const Home: React.FC = () => {
             <p className="font-bold text-foreground">To resolve this:</p>
             <ol className="list-decimal pl-4 space-y-1">
               <li>Close this popup panel.</li>
-              <li>Refresh your active LeetCode browser tab.</li>
+              <li>Refresh your active problem browser tab.</li>
               <li>Re-open the Kepr extension popup.</li>
             </ol>
           </div>
@@ -268,7 +325,7 @@ export const Home: React.FC = () => {
             value={notes}
             onChange={handleNotesChange}
             disabled={!problem}
-            placeholder={problem ? "Write complexity analysis, key takeaways, or notes..." : "Open a LeetCode problem to write notes."}
+            placeholder={problem ? "Write complexity analysis, key takeaways, or notes..." : "Open a problem to write notes."}
             className="w-full h-[220px] bg-[#ffffff05] border border-border rounded-lg p-2.5 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none placeholder:text-muted-foreground/45 transition-colors duration-200 leading-normal"
           />
         ) : (
@@ -298,7 +355,7 @@ export const Home: React.FC = () => {
         )}
         {/* Recommendation Helper Caption */}
         <p className="text-[8.5px] leading-normal text-muted-foreground/60 select-none">
-          We recommend writing notes in LeetCode's Notes section first and then copying them here for long-term storage in GitHub.
+          We recommend writing notes in your coding platform's Notes section first and then copying them here for long-term storage in GitHub.
         </p>
       </div>
 

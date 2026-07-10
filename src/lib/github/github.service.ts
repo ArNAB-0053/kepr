@@ -101,9 +101,16 @@ export const githubService = {
       const octokit = getOctokitClient(settings.pat)
       const { owner, repo } = await parseRepo(octokit, settings.repo)
       
-      // Format directory path: {rootPath}/{id}-{slug}/
-      const cleanRoot = settings.rootPath.replace(/^\/|\/$/g, "") // strip leading/trailing slashes
-      const folderPath = cleanRoot ? `${cleanRoot}/${metadata.id}-${metadata.slug}` : `${metadata.id}-${metadata.slug}`
+      // Determine platform-specific folder path
+      const folderName = metadata.platform === "leetcode" && metadata.id
+        ? `${metadata.id}-${metadata.slug}`
+        : metadata.slug
+        
+      const platformDir = metadata.platform === "leetcode"
+        ? (settings.leetcodeDir || "LeetCode")
+        : (settings.geeksforgeeksDir || "GeeksForGeeks")
+      
+      const folderPath = `${platformDir}/${folderName}`
       
       // 1. Push solution code file
       const fileExt = getFileExtension(metadata.language)

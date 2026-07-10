@@ -173,7 +173,12 @@ export const storageService = {
    */
   async getGitHubSettings(): Promise<GitHubSettings> {
     if (!isExtensionContextActive()) {
-      return mockStore[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS
+      const settings = mockStore[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS
+      if (settings) {
+        settings.leetcodeDir = settings.leetcodeDir || "LeetCode"
+        settings.geeksforgeeksDir = settings.geeksforgeeksDir || "GeeksForGeeks"
+      }
+      return settings
     }
 
     return new Promise((resolve) => {
@@ -183,7 +188,12 @@ export const storageService = {
             console.error("[Kepr] getGitHubSettings error:", chrome.runtime.lastError.message)
             resolve(DEFAULT_GITHUB_SETTINGS)
           } else {
-            resolve(result[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS)
+            const settings = result[STORAGE_KEYS.GITHUB_SETTINGS] || DEFAULT_GITHUB_SETTINGS
+            if (settings) {
+              settings.leetcodeDir = settings.leetcodeDir || "LeetCode"
+              settings.geeksforgeeksDir = settings.geeksforgeeksDir || "GeeksForGeeks"
+            }
+            resolve(settings)
           }
         })
       } catch (error) {

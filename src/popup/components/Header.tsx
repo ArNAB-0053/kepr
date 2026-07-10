@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
         </div>
         <div>
           <h1 className="text-base font-bold tracking-tight text-foreground">Kepr</h1>
-          <p className="text-[10px] text-muted-foreground font-medium">LeetCode GitHub Sync</p>
+          <p className="text-[10px] text-muted-foreground font-medium">GitHub Solutions Sync</p>
         </div>
       </div>
       
