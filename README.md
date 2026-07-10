@@ -108,7 +108,11 @@ GFG/
 
 Click **Save Settings** to persist the configuration.
 
-![Kepr Settings UI](assets/screenshots/settings.png)
+<img
+  src="assets/screenshots/settings.png"
+  alt="Kepr Settings UI"
+  width="350"
+/>
 
 ---
 
