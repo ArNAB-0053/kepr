@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0](https://github.com/ArNAB-0053/kepr/compare/kepr-v1.1.0...kepr-v1.2.0) (2026-07-10)
+
+
+### Added
+
+* setting image changes ([c6e0fca](https://github.com/ArNAB-0053/kepr/commit/c6e0fca0e0f38d42af763b016c8866d07335afdb))
+
 ## [1.1.0](https://github.com/ArNAB-0053/kepr/compare/kepr-v1.0.0...kepr-v1.1.0) (2026-07-10)
 
 
